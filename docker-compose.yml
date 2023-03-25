@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  build-project:
+    container_name: build-project
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: global
+        target: /app
+
+  deploy-project-prod:
+    container_name: deploy-project
+    image: maven:3.8.7
+    working_dir: /app
+    volumes:
+      - type: volume
+        source: global
+        target: /app
+    command:
+      - "java"
+      - "-war"
+      - "target/hello-1.0.war"
+    ports:
+      - "8080:8080"
+    depends_on:
+      build-project:
+        condition: service_completed_successfully
+
+volumes:
+  global:
